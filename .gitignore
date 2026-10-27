@@ -1,0 +1,57 @@
+
+# Compiled Java files
+*.class
+
+# Log files
+*.log
+logs/
+
+# Build output - Maven / Gradle
+target/
+build/
+out/
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Visual Studio Code
+.vscode/
+.history/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Local configuration with passwords / secrets
+application-local.properties
+application-local.yml
+application-local.yaml
+
+# Keep the example configuration
+!application-example.properties
+!application-example.yml
+!application-example.yaml
