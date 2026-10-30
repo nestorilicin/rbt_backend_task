@@ -40,7 +40,8 @@ public class SummaryRepository implements SummaryInterface {
         }
     }
 
-    // kategorija ulazi ako ima trosak (s) ILI budzet (b) u tom mesecu
+    // a category is included if it has an expense (s) OR a budget (b) in the month.
+    // income is never counted as spent. Sorted by spent, then name.
     @Override
     public List<CategorySummary> categories(YearMonth month) throws SQLException {
         String sql = "SELECT c.id, c.name, COALESCE(s.spent, 0) AS spent, b.amount AS budget "
@@ -54,14 +55,14 @@ public class SummaryRepository implements SummaryInterface {
         try (Connection con = dataSource.getConnection();
                 PreparedStatement stm = con.prepareStatement(sql)) {
             stm.setObject(1, month.atDay(1));
-            stm.setObject(2, month.atEndOfMonth());
+            stm.setObject(2, month.atEndOfMonth()); // Date range uses the last day of the month, so there is no "next month" calculation.
             stm.setObject(3, month.atDay(1));
             try (ResultSet rs = stm.executeQuery()) {
                 List<CategorySummary> result = new ArrayList<>();
                 while (rs.next()) {
                     BigDecimal spent = rs.getBigDecimal("spent");
-                    BigDecimal budget = rs.getBigDecimal("budget"); // null ako nema budzeta
-                    BigDecimal remaining = budget == null ? null : budget.subtract(spent);
+                    BigDecimal budget = rs.getBigDecimal("budget"); // no budget means null; otherwise remaining can be negative when over budget.
+                    BigDecimal remaining = budget == null ? null : budget.subtract(spent); 
                     result.add(new CategorySummary(rs.getLong("id"), rs.getString("name"),
                             spent, budget, remaining));
                 }

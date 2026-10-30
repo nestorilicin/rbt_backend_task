@@ -101,7 +101,7 @@ public class TransactionController {
         int totalPages = (int) ((total + size - 1) / size);
         return new PageResponse<>(repo.search(filter, page, size), page, size, total, totalPages);
     }
-    // ---------- pomocne ----------
+    // ---------- helpers ----------
 
     private Transaction getOr404(long id) throws SQLException {
         Transaction t = repo.findById(id);
@@ -111,7 +111,7 @@ public class TransactionController {
         return t;
     }
 
-    // vraca ociscenu kopiju; klijentov id se ignorise
+    // returns a cleaned copy; any id sent by the client is ignored.
     private Transaction validate(Transaction in) throws SQLException {
         String type;
         java.math.BigDecimal amount;

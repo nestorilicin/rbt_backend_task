@@ -9,7 +9,7 @@ import com.example.backend.models.TransactionFilter;
 public interface TransactionInterface {
     Transaction insert(Transaction t) throws SQLException;
 
-    Transaction findById(long id) throws SQLException; // null ako ne postoji
+    Transaction findById(long id) throws SQLException; // returns null if it doesn't exist
 
     void update(long id, Transaction t) throws SQLException;
 
@@ -18,4 +18,6 @@ public interface TransactionInterface {
     List<Transaction> search(TransactionFilter f, int page, int size) throws SQLException;
 
     long count(TransactionFilter f) throws SQLException;
+
+    void insertBatch(List<Transaction> list) throws SQLException;
 }

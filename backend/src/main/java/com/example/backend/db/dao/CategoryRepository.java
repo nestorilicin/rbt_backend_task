@@ -23,6 +23,7 @@ public class CategoryRepository implements CategoryInterface {
         this.dataSource = dataSource;
     }
 
+    // name column uses the collation utf8mb4_0900_as_ci, so "=" is already case-insensitive.
     @Override
     public boolean existsByName(String name) throws SQLException {
         try (
@@ -68,6 +69,7 @@ public class CategoryRepository implements CategoryInterface {
         }
     }
 
+    // used on update: the category's own name must not count as a duplicate.
     @Override
     public boolean existsByNameAndIdNot(String name, long id) throws SQLException {
         try (Connection con = dataSource.getConnection();

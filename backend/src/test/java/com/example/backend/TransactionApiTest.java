@@ -38,7 +38,7 @@ class TransactionApiTest {
         fun = insertCategory("Fun");
     }
 
-    // ---------- pomocne metode ----------
+    // ---------- helpers ----------
 
     private long insertCategory(String name) {
         jdbc.update("INSERT INTO category (name, color) VALUES (?, '#FF0000')", name);
@@ -55,7 +55,6 @@ class TransactionApiTest {
         return s == null ? "null" : "\"" + s + "\"";
     }
 
-    // amount se prosledjuje "sirov" (npr. 12.5, "abc" sa navodnicima, null)
     private static String body(String type, String amount, String date, String description, Long categoryId) {
         return "{\"type\":%s,\"amount\":%s,\"date\":%s,\"description\":%s,\"categoryId\":%s}"
                 .formatted(q(type), amount, q(date), q(description), categoryId);
@@ -79,7 +78,7 @@ class TransactionApiTest {
         return jdbc.queryForObject(sql, Integer.class, args);
     }
 
-    // ---------- T2.1 kreiranje ----------
+    // ---------- T2.1 create ----------
 
     @Test
     void create_valid_returns201() throws Exception {
@@ -171,7 +170,7 @@ class TransactionApiTest {
         postTx("{}", 400);
     }
 
-    // ---------- T2.2 citanje, izmena, brisanje ----------
+    // ---------- T2.2 read, update, delete ----------
 
     @Test
     void get_existing_returns200() throws Exception {
@@ -232,12 +231,12 @@ class TransactionApiTest {
         mvc.perform(delete("/transactions/999999")).andExpect(status().isNotFound());
     }
 
-    // ---------- T2.3 sortiranje i paginacija ----------
+    // ---------- T2.3 sort and paging ----------
 
     @Test
     void list_sortedByDateDesc_thenLatestAddedFirst() throws Exception {
         insertTx("EXPENSE", "1", "2026-10-05", "A", food);
-        insertTx("EXPENSE", "1", "2026-10-05", "B", food); // isti datum, dodata kasnije
+        insertTx("EXPENSE", "1", "2026-10-05", "B", food);
         insertTx("EXPENSE", "1", "2026-10-07", "C", food);
         insertTx("EXPENSE", "1", "2026-10-01", "D", food);
         mvc.perform(get("/transactions"))
@@ -302,7 +301,7 @@ class TransactionApiTest {
         mvc.perform(get("/transactions?size=100")).andExpect(status().isOk());
     }
 
-    // ---------- T2.4 filteri ----------
+    // ---------- T2.4 filters ----------
 
     @Test
     void filter_dateRange_includesBothEnds() throws Exception {

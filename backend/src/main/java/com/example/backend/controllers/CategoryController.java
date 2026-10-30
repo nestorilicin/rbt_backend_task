@@ -31,6 +31,7 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<Category> addCategory(@RequestBody Category category) throws SQLException {
+        // trimmed before validation, so a name with only spaces counts as empty.
         String name = category.getName() == null ? null : category.getName().strip();
         String color = category.getColor() == null ? null : category.getColor().strip();
 
@@ -45,8 +46,11 @@ public class CategoryController {
         return ResponseEntity.created(URI.create("/categories/" + createdCategory.getId())).body(createdCategory);
     }
 
+    // check order: validation (400), existence (404), duplicate name (409).
+    // UNIQUE constraint in the database still catches concurrent duplicates.
     @PutMapping("/{id}")
     public Category updateCategory(@PathVariable long id, @RequestBody Category category) throws SQLException {
+        // trimmed before validation, so a name with only spaces counts as empty.
         String name = category.getName() == null ? null : category.getName().strip();
         String color = category.getColor() == null ? null : category.getColor().strip();
 

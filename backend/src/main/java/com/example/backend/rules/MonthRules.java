@@ -18,6 +18,7 @@ public final class MonthRules {
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("month must be in the format YYYY-MM, e.g. 2026-10");
         }
+        // MySQL DATE only supports years 1000-9999, so anything else would end as a 500 error.
         if (ym.getYear() < 1000 || ym.getYear() > 9999) {
             throw new IllegalArgumentException("year must be between 1000 and 9999");
         }

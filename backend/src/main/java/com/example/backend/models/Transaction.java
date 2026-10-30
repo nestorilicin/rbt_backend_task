@@ -11,12 +11,8 @@ public class Transaction {
     private String description;
     private Long categoryId;
 
-    
-
     public Transaction() {
     }
-
-    
 
     public Transaction(Long id, String type, BigDecimal amount, LocalDate date, String description, Long categoryId) {
         this.id = id;
@@ -26,8 +22,6 @@ public class Transaction {
         this.description = description;
         this.categoryId = categoryId;
     }
-
-
 
     public Long getId() {
         return id;

@@ -89,6 +89,7 @@ public class TransactionRepository implements TransactionInterface {
     @Override
     public List<Transaction> search(TransactionFilter f, int page, int size) throws SQLException {
         List<Object> params = new ArrayList<>();
+        // newest first; the higher id (added later) wins for the same date.
         String sql = "SELECT " + COLUMNS + " FROM app_transaction" + where(f, params)
                 + " ORDER BY date DESC, id DESC LIMIT ? OFFSET ?";
         params.add(size);
@@ -121,10 +122,37 @@ public class TransactionRepository implements TransactionInterface {
         }
     }
 
-    // ---------- pomocne ----------
+    // one database transaction per batch: either the whole batch is saved or none of it.
+    @Override
+    public void insertBatch(List<Transaction> list) throws SQLException {
+        try (Connection con = dataSource.getConnection()) {
+            boolean oldAutoCommit = con.getAutoCommit();
+            con.setAutoCommit(false);
+            try (PreparedStatement stm = con.prepareStatement(
+                    "INSERT INTO app_transaction (type, amount, date, description, category_id) VALUES (?,?,?,?,?)")) {
+                for (Transaction t : list) {
+                    stm.setString(1, t.getType());
+                    stm.setBigDecimal(2, t.getAmount());
+                    stm.setObject(3, t.getDate());
+                    stm.setString(4, t.getDescription());
+                    stm.setLong(5, t.getCategoryId());
+                    stm.addBatch();
+                }
+                stm.executeBatch();
+                con.commit();
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(oldAutoCommit);
+            }
+        }
+    }
 
-    // gradi WHERE samo od filtera koji su poslati; vrednosti idu kao parametri
-    // (nema SQL injection-a)
+    // ---------- helpers ----------
+
+    // builds the WHERE clause only from the filters that were sent.
+    // values are always bound as parameters, so there is no SQL injection.
     private static String where(TransactionFilter f, List<Object> params) {
         StringBuilder sb = new StringBuilder(" WHERE 1=1");
         if (f.from() != null) {
@@ -144,15 +172,13 @@ public class TransactionRepository implements TransactionInterface {
             params.add(f.type());
         }
         if (f.q() != null) {
-            // COLLATE: velika/mala slova se ignorisu, bez obzira na kolaciju tabele
             sb.append(" AND description LIKE ? COLLATE utf8mb4_0900_as_ci");
             params.add("%" + escapeLike(f.q()) + "%");
         }
         return sb.toString();
     }
 
-    // % i _ iz korisnickog unosa postaju obicni znakovi (MySQL podrazumevani escape
-    // znak je \)
+    // makes % and _ typed by the user match as normal characters (MySQL escape char is \).
     private static String escapeLike(String s) {
         return s.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }

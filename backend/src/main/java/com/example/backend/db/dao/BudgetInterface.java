@@ -9,7 +9,7 @@ import java.util.List;
 public interface BudgetInterface {
     void upsert(YearMonth month, long categoryId, java.math.BigDecimal amount) throws SQLException;
 
-    boolean delete(YearMonth month, long categoryId) throws SQLException; // true ako je nesto obrisano
+    boolean delete(YearMonth month, long categoryId) throws SQLException; // true if deleted
 
     List<Budget> findByMonth(YearMonth month) throws SQLException;
 }

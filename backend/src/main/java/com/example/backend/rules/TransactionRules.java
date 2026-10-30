@@ -1,15 +1,17 @@
 package com.example.backend.rules;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class TransactionRules {
     private static final BigDecimal MAX_AMOUNT = new BigDecimal("1000000");
 
-    private TransactionRules(){}
+    private TransactionRules() {
+    }
 
-    public static String type(String raw){
+    public static String type(String raw) {
         String t = raw == null ? "" : raw.strip().toUpperCase();
-        if(!t.equals("INCOME") && !t.equals("EXPENSE")){
+        if (!t.equals("INCOME") && !t.equals("EXPENSE")) {
             throw new IllegalArgumentException("type must be INCOME or EXPENSE");
         }
         return t;
@@ -22,6 +24,7 @@ public class TransactionRules {
         if (a.signum() <= 0) {
             throw new IllegalArgumentException("amount must be greater than 0");
         }
+        // stripTrailingZeros lets 12.500 pass but rejects 12.345.
         if (a.stripTrailingZeros().scale() > 2) {
             throw new IllegalArgumentException("amount must have at most 2 decimals");
         }
@@ -31,12 +34,25 @@ public class TransactionRules {
         return a;
     }
 
+    // trims the text; an empty description becomes null.
     public static String description(String raw) {
-        if (raw == null) return null;
+        if (raw == null)
+            return null;
         String d = raw.strip();
-        if (d.isEmpty()) return null;
+        if (d.isEmpty())
+            return null;
         if (d.length() > 200) {
             throw new IllegalArgumentException("description must be at most 200 characters");
+        }
+        return d;
+    }
+
+    public static LocalDate date(LocalDate d) {
+        if (d == null) {
+            throw new IllegalArgumentException("date is required");
+        }
+        if (d.getYear() < 1970 || d.getYear() > 2100) {
+            throw new IllegalArgumentException("date year must be between 1970 and 2100");
         }
         return d;
     }

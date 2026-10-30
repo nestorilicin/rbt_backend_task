@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 class CategoryApiTest {
 
     @Autowired MockMvc mvc;
-    @Autowired JdbcTemplate jdbc;   // samo za pripremu i proveru podataka u testu
+    @Autowired JdbcTemplate jdbc;   
 
     @BeforeEach
     void cleanDb() {
@@ -58,7 +58,7 @@ class CategoryApiTest {
         return jdbc.queryForObject(sql, Integer.class, args);
     }
 
-    // ---------- T1.1 kreiranje ----------
+    // ---------- T1.1 create ----------
 
     @Test
     void create_trimsName() throws Exception {
@@ -111,7 +111,7 @@ class CategoryApiTest {
                 .andExpect(status().isBadRequest());
     }
 
-    // ---------- T1.2 izmena ----------
+    // ---------- T1.2 update ----------
 
     @Test
     void update_changeOnlyColor_doesNotConflictWithItself() throws Exception {
@@ -158,7 +158,7 @@ class CategoryApiTest {
         putCategory("/categories/abc", "X", "#FF0000", 400);
     }
 
-    // ---------- T1.3 lista i pojedinacna ----------
+    // ---------- T1.3 read list and single ----------
 
     @Test
     void list_empty_returnsEmptyArray() throws Exception {
@@ -198,7 +198,7 @@ class CategoryApiTest {
         mvc.perform(get("/categories/abc")).andExpect(status().isBadRequest());
     }
 
-    // ---------- T1.4 brisanje ----------
+    // ---------- T1.4 delete ----------
 
     @Test
     void delete_withoutTransactions_returns204() throws Exception {

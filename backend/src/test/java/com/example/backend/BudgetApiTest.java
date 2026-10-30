@@ -52,7 +52,7 @@ class BudgetApiTest {
         return jdbc.queryForObject(sql, Integer.class, args);
     }
 
-    // ---------- T3.1 postavljanje / izmena ----------
+    // ---------- T3.1 insert / update ----------
 
     @Test
     void set_firstTime_createsBudget() throws Exception {
@@ -126,7 +126,7 @@ class BudgetApiTest {
         assertEquals(3, count("SELECT COUNT(*) FROM budget"));
     }
 
-    // ---------- T3.2 uklanjanje ----------
+    // ---------- T3.2 delete ----------
 
     @Test
     void delete_removesOnlyThatMonthAndCategory() throws Exception {
@@ -156,7 +156,7 @@ class BudgetApiTest {
                 .andExpect(jsonPath("$.length()").value(0));
     }
 
-    // ---------- T3.3 lista ----------
+    // ---------- T3.3 read list ----------
 
     @Test
     void list_returnsOnlyRequestedMonth() throws Exception {

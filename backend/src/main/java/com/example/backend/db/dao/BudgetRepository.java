@@ -23,8 +23,7 @@ public class BudgetRepository implements BudgetInterface {
         this.dataSource = dataSource;
     }
 
-    // UNIQUE (category_id, month) u bazi: prvi put ubaci, svaki sledeci put izmeni
-    // iznos
+    // insert with update on duplicate
     @Override
     public void upsert(YearMonth month, long categoryId, BigDecimal amount) throws SQLException {
         try (Connection con = dataSource.getConnection();

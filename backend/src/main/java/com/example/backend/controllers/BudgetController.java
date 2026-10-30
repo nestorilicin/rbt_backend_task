@@ -28,7 +28,7 @@ public class BudgetController {
         this.categories = categories;
     }
 
-    // postavi ili promeni budzet (isti poziv, idempotentno)
+    // set or change budget; idempotent
     @PutMapping("/{month}/{categoryId}")
     public Budget set(@PathVariable String month, @PathVariable long categoryId,
             @RequestBody BudgetRequest in) throws SQLException {
@@ -46,6 +46,7 @@ public class BudgetController {
         return new Budget(ym.toString(), categoryId, amount);
     }
 
+    // delete budget for month and category
     @DeleteMapping("/{month}/{categoryId}")
     public ResponseEntity<Void> remove(@PathVariable String month, @PathVariable long categoryId)
             throws SQLException {
